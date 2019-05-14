@@ -13,6 +13,12 @@ class NewVisitorTest(unittest.TestCase):#1
 if __name__ == "__main__":#6
     unittest.main(warnings='ignore')#7
 
+
+'''
+    #####################Diferença entre testes funcionais e de unidade################################
+    Testes funcionais testam a aplicação a partir de seu lado externo, da visão do usuário comum
+    Testes de Unidade testam a aplicação a partir do lado interno, da visão do programador
+'''
 '''
     O que esse código faz:(acompanhe as legendas no código)
 

@@ -1,33 +1,26 @@
 from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest
-from lists.views import home_page #2 - info test_root_url_resolves_to_home_page_view
-
+from lists.views import home_page 
+from django.template.loader import render_to_string
 # Create your tests here.
 
 class HomePageTest(TestCase):
-    '''
-        ******  test_root_url_resolves_to_home_page_view    *********
-    #1 resolve é a função que o Django itiliza internamente para resolver  URLs e descobrir para qual função de view eles devem ser mapeados.
-        Estamos verificando se resolve, quando é chamado com '/', que é a raiz do site, encontra uma função chamada home_page
-    #2 é a função de view que escreveremos  a serguir, a qual na verdade, devolverá o html que queremos
-    '''
-    def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/')#1
-        self.assertEqual(found.func, home_page)#2
 
-    '''
-        *********   test_home_page_returns_correct_html     *********
-        #1 Criamos um objeto HttpRequest, que é  o que o Django verá quando o navegador de um usuário requisitar a página
-        #2 Ele é passado para a nossa view home_page, que nos dará uma resposta.
-        #3 Em seguida extraímos .content da resposta. Esses são os bytes brutos.Chamamos .decode() para convertê-los na string html enviada ao usuário
-        #4 Queremos que comece com uma tag <html> que será fechada mais tarde
-        #5 Além disso, queremos uma tag <title> com o conteúdo 'To-Do lists'
-    '''
     def test_home_page_returns_correct_html(self):
-        request = HttpRequest()#1
-        response = home_page(request)#2
-        html = response.content.decode('utf8')#3
-        self.assertTrue(html.startswith('<html>'))#4
-        self.assertIn('<title>To-Do lists</title>', html)#5
-        self.assertTrue(html.endswith('</html>'))#4
+        response = self.client.get('/') #1
+
+        html = response.content.decode('utf8')#2
+        expected_html = render_to_string('home.html')
+        self.assertTrue(html.startswith('<html>'))
+        self.assertIn('<title>To-Do lists</title>', html)
+        self.assertTrue(html.strip().endswith('</html>'))
+
+        self.assertTemplateUsed(response, 'home.html')#3
+
+        '''
+            #1 Em vez de criar manualmente  um objeto HttpRequest e chamar a função de view de forma direta, chamamos self.client.get, passando a URL que queremos testar
+            #2 Deixaremos os testes antigos  só para ter certeza que tudo está funcionando
+            #3 .assertTemplateUsed é o método de teste que a classe TestCase do Django nos disponibiliza. Ela nos permite verificar qual template foi usada para renderizar
+                uma resposta.(Só funciona para resposta que foram obtidas pelo cliente de teste.)
+        '''
